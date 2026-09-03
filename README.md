@@ -1,1 +1,76 @@
-# calcola-ral-netta
+# Calcolatore RAL → Netto (Prototipo)
+
+Prototipo funzionante che simula la proiezione di retribuzione netta annuale a partire da una Retribuzione Annua Lorda (RAL), mostrando in dettaglio tutte le voci trattenute al lordo (contributi INPS, IRPEF, addizionali regionale e comunale).
+
+**[👉 Prova il calcolatore](#)** *https://marci6.github.io/calcola-ral-netta/*
+
+## Cosa fa
+
+L'utente inserisce una RAL e il numero di mensilità (12, 13 o 14), preme "Calcola" e ottiene:
+
+- netto annuale e netto mensile stimati
+- totale delle trattenute (contributi + imposte) e aliquota effettiva sul lordo
+- una barra visiva che mostra la ripartizione tra netto, contributi INPS e imposte
+- una tabella riga per riga che ricostruisce il percorso completo dalla RAL al netto: contributi INPS → reddito imponibile → IRPEF lorda → detrazioni → IRPEF netta → addizionali locali → bonus in busta paga → netto finale
+
+## Caso coperto
+
+Il prototipo copre un caso standard e semplice, esplicitamente definito in fase di scoping:
+
+- dipendente privato con contratto **a tempo indeterminato**
+- residente a **Milano** (Lombardia)
+- **nessuna agevolazione particolare** (no carichi di famiglia, no welfare, no detrazioni per spese, nessun altro reddito)
+
+Il dominio della busta paga italiana è molto più ampio di questo: il prototipo non intende coprire tutti i casi, ma dimostrare la logica di calcolo su uno scenario realistico e verificabile.
+
+## Logica di calcolo
+
+1. **Contributi INPS a carico del lavoratore**: aliquota unica 9,19% sull'intera RAL.
+2. **Reddito imponibile fiscale**: RAL − contributi INPS.
+3. **IRPEF lorda**: applicazione progressiva degli scaglioni 2026 (23% fino a 28.000 €, 33% da 28.001 a 50.000 €, 43% oltre 50.000 €).
+4. **Detrazioni da lavoro dipendente** (art. 13 TUIR): formula a scaglioni su reddito imponibile ≤15.000 € / 15.000–28.000 € / 28.000–50.000 € / oltre 50.000 €.
+5. **Riduzione del cuneo fiscale 2025–2026**:
+   - **trattamento integrativo** (bonus esentasse) per redditi imponibili fino a 20.000 €, con percentuali decrescenti (7,1% / 5,3% / 4,8%) al crescere del reddito;
+   - **ulteriore detrazione** per redditi imponibili tra 20.000 € e 40.000 € (1.000 € fissi fino a 32.000 €, poi decrescente fino ad azzerarsi a 40.000 €).
+6. **No tax area**: reddito imponibile ≤ 8.500 € → nessuna IRPEF, nessuna addizionale, solo il bonus esentasse.
+7. **Addizionale regionale Lombardia**: aliquota progressiva 1,23% / 1,58% / 1,72% / 1,73% sugli stessi scaglioni IRPEF.
+8. **Addizionale comunale Milano**: aliquota unica 0,8%, con soglia di esenzione totale a 23.000 € di reddito imponibile.
+9. **Netto annuale** = RAL − contributi INPS − IRPEF netta − addizionali + bonus esentasse.
+10. **Netto mensile** = netto annuale / numero di mensilità scelto (la scelta non modifica il netto annuo, solo la sua ripartizione).
+
+## Semplificazioni assunte
+
+Elencate anche direttamente in pagina, nel pannello "Ipotesi e semplificazioni":
+
+- l'aliquota INPS è trattata come flat 9,19% su tutta la RAL: non si applica il contributo aggiuntivo dell'1% oltre 52.190 €, né il massimale contributivo (~120.000 €); sopra queste soglie il netto reale sarebbe leggermente più alto di quello stimato
+- nessun carico di famiglia, nessuna detrazione per spese, nessun altro reddito: la RAL coincide con il reddito complessivo ai fini delle soglie IRPEF
+- non sono simulati: TFR, welfare aziendale, fringe benefit, straordinari, premi di produttività, part-time, giorni di assenza o rapporti di lavoro non annuali
+- il numero di mensilità è una scelta dell'utente e serve solo a ripartire il netto annuo, senza modellare eventuali differenze di trattamento fiscale della quattordicesima
+
+Ogni ulteriore semplificazione è discutibile in sede di colloquio.
+
+## Fonti
+
+- Legge di Bilancio 2026 (L. 199/2025) — scaglioni IRPEF, no tax area, detrazioni da lavoro dipendente, cuneo fiscale
+- Art. 13 TUIR (DPR 917/1986) — detrazioni da lavoro dipendente
+- Regione Lombardia, art. 72 L.R. 10/2003 — addizionale regionale IRPEF
+- Delibera del Comune di Milano — addizionale comunale IRPEF e soglia di esenzione
+- INPS — aliquota contributiva IVS a carico del lavoratore dipendente (9,19%)
+
+## Stack
+
+Nessuna dipendenza esterna: HTML, CSS e JavaScript vanilla in tre file separati (`index.html`, `style.css`, `script.js`), pensati per essere serviti staticamente (es. GitHub Pages) o aperti direttamente da file system.
+
+## Come eseguirlo in locale
+
+Basta aprire `index.html` in un browser, oppure servire la cartella con un server statico qualsiasi, ad esempio:
+
+```bash
+python3 -m http.server 8000
+```
+
+e visitare `http://localhost:8000`.
+
+## Disclaimer
+
+Questo è un prototipo a scopo dimostrativo. I valori calcolati sono stime basate su regole generali e semplificate: non sostituiscono un cedolino ufficiale né una consulenza del lavoro o fiscale.
