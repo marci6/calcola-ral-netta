@@ -1,17 +1,24 @@
 # Calcolatore RAL → Netto
 
-Prototipo funzionante che simula la proiezione di retribuzione netta annuale a partire da una Retribuzione Annua Lorda (RAL), mostrando in dettaglio tutte le voci trattenute al lordo (contributi INPS, IRPEF, addizionali regionale e comunale).
+Calcolatore che simula la proiezione di retribuzione netta annuale a partire da una Retribuzione Annua Lorda (RAL) — e viceversa — mostrando in dettaglio tutte le voci trattenute al lordo (contributi INPS, IRPEF, addizionali regionale e comunale).
 
 **[👉 Prova il calcolatore](https://marci6.github.io/calcola-ral-netta/)** *https://marci6.github.io/calcola-ral-netta/*
 
+# RAL ↔ Netto (Prototipo Feedbackloops)
+
 ## Cosa fa
 
-L'utente inserisce una RAL e il numero di mensilità (12, 13 o 14), preme "Calcola" e ottiene:
+L'utente sceglie una modalità e il numero di mensilità (12, 13 o 14), preme "Calcola" e ottiene:
+
+- **Modalità RAL → Netto**: inserisce una RAL e ottiene netto annuale e mensile stimati.
+- **Modalità Netto → RAL**: inserisce il netto mensile che vorrebbe percepire e il prototipo trova, tramite ricerca numerica, la RAL necessaria a produrlo.
+
+In entrambi i casi il risultato include:
 
 - netto annuale e netto mensile stimati
 - totale delle trattenute (contributi + imposte) e aliquota effettiva sul lordo
 - una barra visiva che mostra la ripartizione tra netto, contributi INPS e imposte
-- una tabella riga per riga che ricostruisce il percorso completo dalla RAL al netto: contributi INPS → reddito imponibile → IRPEF lorda → detrazioni → IRPEF netta → addizionali locali → bonus in busta paga → netto finale
+- una tabella riga per riga che ricostruisce il percorso completo dalla RAL al netto — ogni voce con **importo assoluto e relativa percentuale sulla RAL**, per capire subito il peso di ogni trattenuta: contributi INPS → reddito imponibile → IRPEF lorda → detrazioni → IRPEF netta → addizionali locali → bonus in busta paga → netto finale
 
 ## Caso coperto
 
@@ -38,6 +45,18 @@ Il dominio della busta paga italiana è molto più ampio di questo: il prototipo
 9. **Netto annuale** = RAL − contributi INPS − IRPEF netta − addizionali + bonus esentasse.
 10. **Netto mensile** = netto annuale / numero di mensilità scelto (la scelta non modifica il netto annuo, solo la sua ripartizione).
 
+### Calcolo inverso: Netto → RAL
+
+Il sistema fiscale italiano è a scaglioni e soglie discontinue (IRPEF, detrazioni, addizionali, cuneo fiscale cambiano formula a ogni soglia di reddito): non esiste quindi una formula chiusa per invertire "da netto a RAL". Il prototipo risolve il problema con una **ricerca numerica per bisezione**:
+
+1. il netto mensile desiderato viene moltiplicato per il numero di mensilità, ottenendo un netto annuo target;
+2. la funzione di calcolo diretto (`calcolaDaRAL`) viene eseguita ripetutamente su un intervallo di RAL candidate, dimezzando l'intervallo a ogni iterazione (60 iterazioni, sufficienti per una precisione ben sotto il centesimo di euro);
+3. la funzione netto(RAL) è monotona crescente — a parità di condizioni, più RAL implica sempre più netto, perché nessuna aliquota marginale nel sistema può superare il 100% — quindi la bisezione converge in modo affidabile.
+
+## Percentuali
+
+Ogni riga della tabella di dettaglio mostra, oltre all'importo assoluto, la sua incidenza percentuale sulla RAL di partenza. Questo rende immediato capire, ad esempio, quanto pesano da soli i contributi INPS rispetto all'IRPEF, o quanto valgono le addizionali locali in proporzione al lordo — un dato che il solo importo in euro non comunica altrettanto bene, specialmente confrontando RAL diverse.
+
 ## Semplificazioni assunte
 
 Elencate anche direttamente in pagina, nel pannello "Ipotesi e semplificazioni":
@@ -49,15 +68,7 @@ Elencate anche direttamente in pagina, nel pannello "Ipotesi e semplificazioni":
 
 Ogni ulteriore semplificazione è discutibile in sede di colloquio.
 
-## Fonti
-
-- Legge di Bilancio 2026 (L. 199/2025) — scaglioni IRPEF, no tax area, detrazioni da lavoro dipendente, cuneo fiscale
-- Art. 13 TUIR (DPR 917/1986) — detrazioni da lavoro dipendente
-- Regione Lombardia, art. 72 L.R. 10/2003 — addizionale regionale IRPEF
-- Delibera del Comune di Milano — addizionale comunale IRPEF e soglia di esenzione
-- INPS — aliquota contributiva IVS a carico del lavoratore dipendente (9,19%)
-
-## Approccio al problema
+## Approccio al prodotto
 
 Basandosi sui dati aggregati delle ricerche relative alle keyword "Ral", "Ral netta", "calcolo ral", è chiaro che il problema piu commune per gli utenti è calcolare la propria RAL netta.
 
@@ -67,11 +78,19 @@ Cosa serve realmente all' utente e cosa si chiederà dopo aver usato il calcolat
 
 Se il calcolatore fa bene il suo lavoro, l'utente non si ferma al primo numero. Le domande naturali che seguono possono essere:
 
-"Perché questo numero è diverso da quello che mi ha detto un altro sito/il mio consulente?" → da qui l'importanza di esporre il dettaglio riga per riga, non solo il totale.
-"E se guadagnassi X in più, quanto mi resta davvero in tasca?" → interesse a confrontare scenari (aumento, cambio offerta), non solo un valore statico.
-"Quanto costo io all'azienda, non solo quanto ricevo io?" → collegamento naturale al costo-azienda (esattamente il secondo tool che Jet HR offre in coppia con questo).
-"Cosa cambia se vivo in un altro comune / ho un contratto diverso / ho figli a carico?" → il limite più immediato di un prototipo semplificato, ed è la ragione per cui è importante dichiarare esplicitamente cosa non è coperto, invece di dare un falso senso di precisione.
-"Posso fidarmi di questo per negoziare?" → torna il tema della fiducia: la fonte normativa citata (Legge di Bilancio, INPS, TUIR) conta quanto il numero stesso.
+- "Perché questo numero è diverso da quello che mi ha detto un altro sito/il mio consulente?" → da qui l'importanza di esporre il dettaglio riga per riga, non solo il totale. 
+- "E se guadagnassi X in più, quanto mi resta davvero in tasca?" → interesse a confrontare scenari (aumento, cambio offerta), non solo un valore statico.
+- "Quanto costo io all'azienda, non solo quanto ricevo io?" → collegamento naturale al costo-azienda (esattamente il secondo tool che Jet HR offre in coppia con questo).
+- "Cosa cambia se vivo in un altro comune / ho un contratto diverso / ho figli a carico?" → il limite più immediato di un prototipo semplificato, ed è la ragione per cui è importante dichiarare esplicitamente cosa non è coperto, invece di dare un falso senso di precisione.
+- "Posso fidarmi di questo per negoziare?" → torna il tema della fiducia: la fonte normativa citata (Legge di Bilancio, INPS, TUIR) conta quanto il numero stesso.
+
+## Fonti
+
+- Legge di Bilancio 2026 (L. 199/2025) — scaglioni IRPEF, no tax area, detrazioni da lavoro dipendente, cuneo fiscale
+- Art. 13 TUIR (DPR 917/1986) — detrazioni da lavoro dipendente
+- Regione Lombardia, art. 72 L.R. 10/2003 — addizionale regionale IRPEF
+- Delibera del Comune di Milano — addizionale comunale IRPEF e soglia di esenzione
+- INPS — aliquota contributiva IVS a carico del lavoratore dipendente (9,19%)
 
 ## Disclaimer
 
