@@ -1,8 +1,8 @@
-# Calcolatore RAL → Netto (Prototipo)
+# Calcolatore RAL → Netto
 
 Prototipo funzionante che simula la proiezione di retribuzione netta annuale a partire da una Retribuzione Annua Lorda (RAL), mostrando in dettaglio tutte le voci trattenute al lordo (contributi INPS, IRPEF, addizionali regionale e comunale).
 
-**[👉 Prova il calcolatore](#)** *https://marci6.github.io/calcola-ral-netta/*
+**[👉 Prova il calcolatore](https://marci6.github.io/calcola-ral-netta/)** *https://marci6.github.io/calcola-ral-netta/*
 
 ## Cosa fa
 
@@ -57,19 +57,21 @@ Ogni ulteriore semplificazione è discutibile in sede di colloquio.
 - Delibera del Comune di Milano — addizionale comunale IRPEF e soglia di esenzione
 - INPS — aliquota contributiva IVS a carico del lavoratore dipendente (9,19%)
 
-## Stack
+## Approccio al problema
 
-Nessuna dipendenza esterna: HTML, CSS e JavaScript vanilla in tre file separati (`index.html`, `style.css`, `script.js`), pensati per essere serviti staticamente (es. GitHub Pages) o aperti direttamente da file system.
+Basandosi sui dati aggregati delle ricerche relative alle keyword "Ral", "Ral netta", "calcolo ral", è chiaro che il problema piu commune per gli utenti è calcolare la propria RAL netta.
 
-## Come eseguirlo in locale
+Quali sono le soluzioni giá sul mercato? Vari sito offrono calcolatore pi`u o meno complessi che tengono in considerazioni i vari fattori di tassazione.
 
-Basta aprire `index.html` in un browser, oppure servire la cartella con un server statico qualsiasi, ad esempio:
+Cosa serve realmente all' utente e cosa si chiederà dopo aver usato il calcolatore?
 
-```bash
-python3 -m http.server 8000
-```
+Se il calcolatore fa bene il suo lavoro, l'utente non si ferma al primo numero. Le domande naturali che seguono possono essere:
 
-e visitare `http://localhost:8000`.
+"Perché questo numero è diverso da quello che mi ha detto un altro sito/il mio consulente?" → da qui l'importanza di esporre il dettaglio riga per riga, non solo il totale.
+"E se guadagnassi X in più, quanto mi resta davvero in tasca?" → interesse a confrontare scenari (aumento, cambio offerta), non solo un valore statico.
+"Quanto costo io all'azienda, non solo quanto ricevo io?" → collegamento naturale al costo-azienda (esattamente il secondo tool che Jet HR offre in coppia con questo).
+"Cosa cambia se vivo in un altro comune / ho un contratto diverso / ho figli a carico?" → il limite più immediato di un prototipo semplificato, ed è la ragione per cui è importante dichiarare esplicitamente cosa non è coperto, invece di dare un falso senso di precisione.
+"Posso fidarmi di questo per negoziare?" → torna il tema della fiducia: la fonte normativa citata (Legge di Bilancio, INPS, TUIR) conta quanto il numero stesso.
 
 ## Disclaimer
 
