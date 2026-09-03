@@ -4,7 +4,7 @@ Calcolatore che simula la proiezione di retribuzione netta annuale a partire da 
 
 **[👉 Prova il calcolatore](https://marci6.github.io/calcola-ral-netta/)** *https://marci6.github.io/calcola-ral-netta/*
 
-# RAL ↔ Netto (Prototipo Feedbackloops)
+# RAL ↔ Netto
 
 ## Cosa fa
 
